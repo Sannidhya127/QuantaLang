@@ -21,5 +21,5 @@ def pauli_z(qubit):
     return Qubit(complex(qubit.alpha.real, -qubit.beta.imag), complex(-qubit.alpha.imag, qubit.beta.real))
 
 
-a = probe.Probe(333)
+a = probe.sum(3,3,3)
 print(a)
