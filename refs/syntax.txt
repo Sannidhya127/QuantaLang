@@ -1,0 +1,28 @@
+state q = Qubit(0,1)
+
+var a = int(20)
+
+var l = list([1,2,"hey",33,34.3])
+
+Probe.Probe(q)
+
+HGATE(q)
+XGATE(q)
+YGATE(q)
+ZGATE(q)
+SGATE(q)
+CNOTGATE(q)
+
+var qubitList = list([Qubit(1, 0), Qubit(0, 1), Qubit(1/math.sqrt(2), 1/math.sqrt(2))])
+
+cir circuit = QCIRCUIT(3)
+
+circuit.addGate(H)
+circuit.addGate(X)
+circuit.addGate(Y)
+
+exec(circuit, qubitList)
+
+var gateOps = list(['H', 'X', 'Y', 'Z', 'CNOT'])
+
+exec(circuit, qubitList).map(gateOps)
