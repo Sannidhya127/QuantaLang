@@ -141,3 +141,24 @@ def controlled_y_gate(control_qubit, target_qubit):
 # print("Collapsed qubit state:", qubit)
 # print(Qubit(1, 0))
 # print(hadamard(Qubit(1, 0)))
+
+# Create qubits
+qubit1 = Qubit(1, 0)  # Control qubit
+qubit2 = Qubit(1, 0)  # Target qubit
+
+# Apply Controlled-U gate
+result_cu_control, result_cu_target = controlled_u_gate(qubit1, qubit2, np.pi/4)
+    
+# Apply Controlled-Y gate
+result_cy_control, result_cy_target = controlled_y_gate(qubit1, qubit2)
+
+# Print results
+print("State after applying Controlled-U gate to control qubit:")
+print(result_cu_control)
+print("State after applying Controlled-U gate to target qubit:")
+print(result_cu_target)
+
+print("State after applying Controlled-Y gate to control qubit:")
+print(result_cy_control)
+print("State after applying Controlled-Y gate to target qubit:")
+print(result_cy_target)

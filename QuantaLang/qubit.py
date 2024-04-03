@@ -8,8 +8,9 @@ class Qubit:
         self.normalize()
 
     def normalize(self):
-        norm_squared = abs(self.alpha)**2 + abs(self.beta)**2
-        norm = np.sqrt(norm_squared) if norm_squared != 0 else 1  # Ensure non-zero norm
+        norm_squared = np.abs(self.alpha)**2 + np.abs(self.beta)**2
+        norm = np.sqrt(norm_squared + np.finfo(float).eps)  # Add epsilon to avoid division by zero
+        norm = np.where(np.isnan(norm), 1, norm)  # Replace NaN values with 1
         self.alpha /= norm
         self.beta /= norm
 
