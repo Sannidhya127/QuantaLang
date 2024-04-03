@@ -1,4 +1,4 @@
-state q = Qubit(0,1)
+var q = Qubit(0,1)
 
 var a = int(20)
 

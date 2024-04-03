@@ -16,6 +16,7 @@ def pauli_x(qubit):
     x_matrix = np.array([[0, 1],
                          [1, 0]])
     new_state = np.dot(x_matrix, qubit.state)
+    
     state_str = f"|0⟩: {new_state[0].real}, |1⟩: {new_state[1].real}"
     
     return Qubit(new_state[0], new_state[1])
@@ -48,16 +49,95 @@ def phase_gate(qubit):
     return Qubit(new_state[0], new_state[1])
 
 
-def cnot_gate(qubit):
+# Define the CNOT gate function
+def cnot_gate(control, target):
     # Apply the CNOT gate operation
-    if qubit.alpha == 1:
-        # If the control qubit is |1⟩, flip the state of the target qubit
-        new_target_state = 1 - qubit.beta
-    else:
-        # If the control qubit is |0⟩, leave the target qubit unchanged
-        new_target_state = qubit.beta
+    if control == 1:
+        # If the control qubit is in state |1⟩, flip the state of the target qubit
+        target = 1 - target
+    # Return the resulting state of the target qubit
+    return target
+
+
+def t_gate(qubit):
+    # Define the T gate matrix
+    t_matrix = np.array([[1, 0],
+                         [0, np.exp(1j * np.pi / 4)]])
     
-    return new_target_state
+    # Apply the T gate operation to the qubit
+    new_state = np.dot(t_matrix, qubit.state)
+    
+    # Create and return a new qubit object with the updated state
+    return Qubit(new_state)
+
+
+def swap_gate(qubit1, qubit2):
+    # Apply the SWAP gate operation to two qubits
+    new_state = np.zeros_like(qubit1.state)
+    new_state[0] = qubit2.state[0]
+    new_state[1] = qubit1.state[1]
+    return Qubit(new_state)
+
+def controlled_z_gate(control_qubit, target_qubit):
+    # Define the controlled-Z gate matrix
+    cz_matrix = np.array([[1, 0, 0, 0],
+                          [0, 1, 0, 0],
+                          [0, 0, 1, 0],
+                          [0, 0, 0, -1]])
+    # Construct the joint state of control and target qubits
+    joint_state = np.kron(control_qubit.state, target_qubit.state)
+    
+    # Apply the controlled-Z gate operation to the joint state
+    new_state = np.dot(cz_matrix, joint_state)
+    
+    # Create and return new qubit objects for control and target qubits with the updated state
+    new_control_state = new_state[:2]
+    new_target_state = new_state[2:]
+    return Qubit(new_control_state), Qubit(new_target_state)
+
+
+def controlled_u_gate(control_qubit, target_qubit, theta):
+    # Define the controlled-U gate matrix
+    cu_matrix = np.array([[1, 0, 0, 0],
+                          [0, 1, 0, 0],
+                          [0, 0, np.cos(theta), -np.sin(theta)],
+                          [0, 0, np.sin(theta), np.cos(theta)]])
+    
+    # Construct the joint state of control and target qubits
+    joint_state = np.kron(control_qubit.state, target_qubit.state)
+    
+    # Apply the controlled-U gate operation to the joint state
+    new_state = np.dot(cu_matrix, joint_state)
+    
+    # Create and return new qubit objects for control and target qubits with the updated state
+    new_control_state = new_state[:2]
+    new_target_state = new_state[2:]
+    return Qubit(new_control_state), Qubit(new_target_state)
+
+def controlled_y_gate(control_qubit, target_qubit):
+    # Define the controlled-Y gate matrix
+    cy_matrix = np.array([[1, 0, 0, 0],
+                          [0, 1, 0, 0],
+                          [0, 0, 0, -1j],
+                          [0, 0, 1j, 0]])
+    
+    # Construct the joint state of control and target qubits
+    joint_state = np.kron(control_qubit.state, target_qubit.state)
+    
+    # Apply the controlled-Y gate operation to the joint state
+    new_state = np.dot(cy_matrix, joint_state)
+    
+    # Create and return new qubit objects for control and target qubits with the updated state
+    new_control_state = new_state[:2]
+    new_target_state = new_state[2:]
+    return Qubit(new_control_state), Qubit(new_target_state)
 # print(pauli_x(Qubit(1, 0)))
 # print(pauli_y(Qubit(1, 0)))
 # print(pauli_z(Qubit(1, 0)))
+# qubit = Qubit(1.5367, 0.45672) # Example qubit in superposition
+# print(qubit)
+# measurement_outcome = qubit.measure_and_collapse()
+# print("Measurement outcome:", measurement_outcome)
+# print("Collapsed qubit state:", qubit)
+# print(Qubit(1, 0))
+# print(hadamard(Qubit(1, 0)))

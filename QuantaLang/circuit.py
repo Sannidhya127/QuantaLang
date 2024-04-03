@@ -39,7 +39,7 @@ class QCIRCUIT:
 # Example usage
 
 
-# # Create a quantum circuit with 3 qubits
+# Create a quantum circuit with 3 qubits
 # circuit = QCIRCUIT(3)
 
 # # Add gate operations to the circuit
