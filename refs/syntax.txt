@@ -1,10 +1,16 @@
-var q = Qubit(0,1)
-
+var qubitA = Qubit(0,1)
+var qubitb = Qubit(1,0)
 var a = int(20)
 
 var l = list([1,2,"hey",33,34.3])
 
 Probe.Probe(q)
+
+Entangle(qubitA,qubitb, bell_state)
+
+var reg = Register(10)
+
+reg.GATE(HGATE)
 
 HGATE(q)
 XGATE(q)
@@ -26,3 +32,24 @@ exec(circuit, qubitList)
 var gateOps = list(['H', 'X', 'Y', 'Z', 'CNOT'])
 
 exec(circuit, qubitList).map(gateOps)
+
+func manual(gateList, qubit){
+    for(i in gateList){
+        var result = i(qubit)
+        probe(result)
+    }
+}
+
+if (HGATE(qubit1) == 0){
+    probe("Some Statement")
+
+}
+
+else if (HGATE(qubit2) == 0){
+    probe("None Statement")
+}
+
+else{
+    probe("Some other Statement")
+}
+

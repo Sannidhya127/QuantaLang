@@ -14,7 +14,8 @@ class Qubit:
         self.alpha /= norm
         self.beta /= norm
 
-
+    def conj(self):
+        return self.state.conj()
     @property
     def state(self):
         return np.array([self.alpha, self.beta])

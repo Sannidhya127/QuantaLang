@@ -72,11 +72,13 @@ def t_gate(qubit):
 
 
 def swap_gate(qubit1, qubit2):
-    # Apply the SWAP gate operation to two qubits
-    new_state = np.zeros_like(qubit1.state)
-    new_state[0] = qubit2.state[0]
-    new_state[1] = qubit1.state[1]
-    return Qubit(new_state)
+     # Apply the SWAP gate operation
+    new_state = np.zeros(4, dtype=complex)
+    new_state[0] = qubit1.alpha * qubit2.alpha
+    new_state[1] = qubit1.alpha * qubit2.beta
+    new_state[2] = qubit1.beta * qubit2.alpha
+    new_state[3] = qubit1.beta * qubit2.beta
+    return new_state
 
 def controlled_z_gate(control_qubit, target_qubit):
     # Define the controlled-Z gate matrix
@@ -131,8 +133,7 @@ def controlled_y_gate(control_qubit, target_qubit):
     new_control_state = new_state[:2]
     new_target_state = new_state[2:]
     return Qubit(new_control_state), Qubit(new_target_state)
-# print(pauli_x(Qubit(1, 0)))
-# print(pauli_y(Qubit(1, 0)))
+
 # print(pauli_z(Qubit(1, 0)))
 # qubit = Qubit(1.5367, 0.45672) # Example qubit in superposition
 # print(qubit)
@@ -141,24 +142,6 @@ def controlled_y_gate(control_qubit, target_qubit):
 # print("Collapsed qubit state:", qubit)
 # print(Qubit(1, 0))
 # print(hadamard(Qubit(1, 0)))
+# uGate = controlled_u_gate(Qubit(0.707,0.707), Qubit(1, 0), np.pi/2)
 
-# Create qubits
-qubit1 = Qubit(1, 0)  # Control qubit
-qubit2 = Qubit(1, 0)  # Target qubit
-
-# Apply Controlled-U gate
-result_cu_control, result_cu_target = controlled_u_gate(qubit1, qubit2, np.pi/4)
-    
-# Apply Controlled-Y gate
-result_cy_control, result_cy_target = controlled_y_gate(qubit1, qubit2)
-
-# Print results
-print("State after applying Controlled-U gate to control qubit:")
-print(result_cu_control)
-print("State after applying Controlled-U gate to target qubit:")
-print(result_cu_target)
-
-print("State after applying Controlled-Y gate to control qubit:")
-print(result_cy_control)
-print("State after applying Controlled-Y gate to target qubit:")
-print(result_cy_target)
+# print(uGate[0], uGate[1])
