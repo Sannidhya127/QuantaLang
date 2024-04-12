@@ -1,0 +1,5 @@
+{
+    "python.analysis.extraPaths": [
+        "./QuantaLang/core_lib"
+    ]
+}
