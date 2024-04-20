@@ -6,6 +6,70 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import SVC
 from sklearn.pipeline import Pipeline
+import spacy
+import re
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+
+def infer_data_type(value):
+    # Check for numeric types
+    try:
+        int_value = int(value)
+        return "int"
+    except ValueError:
+        pass
+
+    try:
+        float_value = float(value)
+        return "float"
+    except ValueError:
+        pass
+
+    # Check for boolean type
+    if value.lower() in ["true", "false", "1", "0"]:
+        return "bool"
+
+    # Check for date and time types (not implemented in this example)
+
+    # Fallback to string type
+    return "str"
+# Load spaCy English model
+nlp = spacy.load("en_core_web_sm")
+
+# Define regular expressions for matching variable declarations
+var_declaration_pattern = r"(let|var|const)\s+(\w+)\s*[:=]\s*(\w+|\d+)"
+
+
+def extract_variable_info(code_snippet):
+    # Tokenize the code snippet using spaCy
+    doc = nlp(code_snippet)
+    
+    # Initialize variables to store extracted information
+    variable_info = []
+
+    # Find variable declarations using regular expressions
+    var_declarations = re.findall(var_declaration_pattern, code_snippet)
+    
+    # Process each variable declaration
+    for declaration in var_declarations:
+        declaration_type, variable_name, value = declaration
+        data_type = infer_data_type(value)
+        variable_info.append({
+            "type": data_type,
+            "name": variable_name,
+            "value": value
+        })
+    
+    return variable_info
+
+
+# Example code snippet
+code_snippet = "let x = 10"
+variable_info = extract_variable_info(code_snippet)
+print(variable_info)
+
+
 def find_most_similar_code(code_string, code_snippets):
     # Initialize the CountVectorizer
     vectorizer = CountVectorizer().fit_transform([code_string] + code_snippets)
@@ -38,7 +102,7 @@ def compare_code(code, snippets):
 # Define the code snippets
 code_snippets = [
     "import math",
-    "let int a = 4",
+    "int a = 4",
     "qubit q1 = (2,3)",
     "if (q1 < 0): probe.str(Nice)",
     "else-if (q1 > 0): probe.int(0)",
@@ -59,58 +123,12 @@ model = Pipeline([
 model.fit(code_snippets, labels)
 
 # Given code string
-given_code = "let int b = 5"
+given_code = "b = 5"
 
 # Predict the label for the given code
 predicted_label = model.predict([given_code])[0]
 print("Predicted label:", predicted_label)
 
-# This is the other part
+# if predicted_label == "variable_declaration":
+    
 
-tokenizer = Tokenizer()
-tokenizer.fit_on_texts(code_snippets)
-
-max_length = max([len(text.split()) for text in code_snippets])
-
-sequences = tokenizer.texts_to_sequences(code_snippets)
-padded_sequences = pad_sequences(sequences, maxlen=max_length, padding='post')
-
-# Define the model architecture
-model = tf.keras.Sequential([
-    tf.keras.layers.Embedding(input_dim=len(tokenizer.word_index)+1, output_dim=64, input_length=max_length+1),
-    tf.keras.layers.LSTM(64, return_sequences=True),
-    tf.keras.layers.Dense(len(tokenizer.word_index)+1, activation='softmax')
-])
-
-model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-
-# Pad the sequences with zeros to match the expected input shape
-X = pad_sequences(sequences, maxlen=max_length+1, padding='post')
-
-# Separate input and output sequences
-y = np.roll(X, -1, axis=1)
-y[:, -1] = 0  # Set the last token to 0 as it does not have a corresponding output
-
-# Train the model
-model.fit(X, y, epochs=50, verbose=1)
-
-
-
-# Generate compiled output
-for snippet in code_snippets:
-    sequence = tokenizer.texts_to_sequences([snippet])[0]
-    padded_sequence = pad_sequences([sequence], maxlen=max_length+1, padding='post')  # Change to max_length+1
-    prediction = model.predict(padded_sequence)
-    predicted_token_index = np.argmax(prediction[0])  # Find the index with the highest probability
-    predicted_token = tokenizer.index_word.get(predicted_token_index, '<UNK>')  # Use get method with default value
-    print("Predicted next token:", predicted_token)
-
-from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.feature_extraction.text import CountVectorizer
-
-code_string = "for i in range(10): print(i)"
-print(find_most_similar_code(code_string, code_snippets))
-
-given_code = "let int b = 5"
-best_snippet = compare_code(given_code, code_snippets)
-print("Given code resembles:", best_snippet)
