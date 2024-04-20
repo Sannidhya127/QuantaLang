@@ -136,7 +136,29 @@ class var:
         def __str__(self):
             return str(self.value)
 
+    class var(Deposit):
+        @call_method
+        def __init__(self, variable, value):
+            global KeyValue
+            self.variable = variable
+            self.value = value
+            KeyValue = None
+            for item in data:
+                # Check if the 'variable' key matches your key
+                if item["variable"] == self.value:
+                    # Extract the 'value' key
+                    KeyValue = item['value']
+                    break
+            else:
+                print("Variable not found")
+            new_data = {
+                "variable": self.variable,
+                "value": KeyValue,
+                "type": "var"
+            }
+            data.append(new_data)
 
+        def __str__(self):
+            return f"{self.value}"
    
 
-print(var.bool("tf", True))

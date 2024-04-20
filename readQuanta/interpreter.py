@@ -23,36 +23,19 @@ if __name__ == '__main__':
         i+=1
         if get == "exit":
             break
-        elif get[0:3] == 'var':
+        elif get[0:3] == 'let':
             get = get[4:]
-            if get[0:3] == 'int':
-                idv = get[4:].split('=')
-                idv[0] = idv[0].strip()
-                var.int(int(idv[1]))
-            elif get[0:5] == 'float':
-                get = get[6:]
-                print(var.float(float(get)))
-            elif get[0:6] == 'complex':
-                get = get[7:]
-                get = get.split(',')
-                print(var.complex(float(get[0]), float(get[1])))
-            elif get[0:3] == 'str':
-                get = get[4:]
-                print(var.str(get))
-            elif get[0:4] == 'bool':
-                get = get[5:]
-                print(var.bool(bool(get)))
-            elif get[0:4] == 'list':
-                get = get[5:]
-                get = get.split(',')
-                print(var.list(get))
-            elif get[0:4] == 'dict':
-                get = get[5:]
-                get = get.split(',')
-                print(var.dict(get))
-            else:
-                print("Invalid data type")
+            kID = get.index('=')
+            varDats = get[0:kID]
+            varValue = get[kID+1:]
+            typeDat = varDats.split(" ")
+            print(varValue)
+            print(typeDat)
+            method = getattr(var, typeDat[0])
+            init = method(typeDat[1], varValue)
+           
+
         elif get[0:5] == 'probe':
-            Probe.Probe(get[6:])
+            print(Probe.Probe(get[5:]))
         else:
             pass

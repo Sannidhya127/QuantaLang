@@ -1,1 +1,1 @@
-[{"variable": "name", "value": "sd", "type": "str"}, {"variable": "flt", "value": 7.33, "type": "float"}, {"variable": "tf", "value": true, "type": "bool"}]
+[{"variable": "a", "value": 4, "type": "int"}]
