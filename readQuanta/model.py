@@ -10,9 +10,18 @@ import spacy
 import re
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-
+from sympy import symbols, simplify
 
 def infer_data_type(value):
+    """
+    Infer the data type of a given value.
+
+    Parameters:
+    value (str): The value to infer the data type from.
+
+    Returns:
+    str: The inferred data type of the value.
+    """
     # Check for numeric types
     try:
         int_value = int(value)
@@ -98,6 +107,66 @@ def compare_code(code, snippets):
             max_similarity = similarity
             best_match = snippet
     return best_match
+def parse_value(value, variables):
+    # Tokenize the value using spaCy
+    tokens = nlp(value)
+
+    # Check if the value contains letters (indicating variables)
+    contains_letters = any(token.is_alpha for token in tokens)
+
+    # Check if the value contains commas (indicating multiple values)
+    contains_commas = "," in value
+
+    # Check if the value contains operators (indicating a mathematical expression)
+    contains_operators = any(token.text in "+-*/" for token in tokens)
+
+    # Check if the value contains digits (indicating numeric values)
+    contains_digits = any(token.text.isdigit() for token in tokens)
+
+    # Check if the value contains a polynomial expression
+    is_polynomial = False
+    if contains_letters and contains_operators:
+        # If the value contains letters and operators, it might be a polynomial
+        # Check if the expression follows the pattern of a polynomial
+        polynomial_pattern = r"([+-]?\d*[a-zA-Z]+\^?\d*)+([+-]?\d*[a-zA-Z]+\^?\d*)*"
+        if re.fullmatch(polynomial_pattern, value):
+            is_polynomial = True
+
+    # Evaluate the value if it contains variables
+    evaluated_value = None
+    if contains_letters:
+        if contains_commas:
+            # Currently not supporting substitution for string containing multiple values
+            value_type = "String containing multiple values"
+        elif is_polynomial:
+            # Create symbols for the variables
+            vars = symbols(variables.keys())
+            # Substitute variable values and simplify the expression
+            substituted_value = simplify(value, dict(zip(vars, variables.values())))
+            evaluated_value = substituted_value
+            value_type = "Polynomial"
+        else:
+            # Replace variables with their values
+            for var, val in variables.items():
+                value = value.replace(var, str(val))
+            evaluated_value = value
+            value_type = "Variable expression"
+    elif contains_digits and contains_operators:
+        # Evaluate the mathematical expression
+        evaluated_value = eval(value)
+        value_type = "Mathematical expression"
+    elif contains_digits or "." in value:
+        # Check if the value contains a dot (indicating a float)
+        evaluated_value = float(value)
+        value_type = "Float"
+    elif contains_digits:
+        # Check if the value is an integer
+        evaluated_value = int(value)
+        value_type = "Integer"
+    else:
+        value_type = "Unknown"
+
+    return value_type, evaluated_value
 
 # Define the code snippets
 code_snippets = [
@@ -132,3 +201,21 @@ print("Predicted label:", predicted_label)
 # if predicted_label == "variable_declaration":
     
 
+# Test the function with different types of values
+values = [
+    "Hello, world!",      # String containing multiple values
+    "x + 2*y - 3",        # Polynomial expression
+    "x * y + 5",          # Polynomial expression
+    "42",                 # Integer
+    "3.14",               # Float
+    "2.7e-3",             # Float
+    "12 + 34 / 5",        # Mathematical expression
+]
+
+variables = {
+    'x': 5,
+    'y': 3
+}
+for value in values:
+    value_type, evaluated_value = parse_value(value, variables)
+    print(f"Value: {value}, Type: {value_type}, Evaluated Value: {evaluated_value}")
